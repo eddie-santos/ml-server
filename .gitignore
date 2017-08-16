@@ -1,0 +1,10 @@
+spark-warehose
+logs
+target
+/.idea
+/.idea_modules
+/.classpath
+/.project
+/.settings
+*.iml
+/RUNNING_PID

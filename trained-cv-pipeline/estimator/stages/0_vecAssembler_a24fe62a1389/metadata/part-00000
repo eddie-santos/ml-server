@@ -1,0 +1,1 @@
+{"class":"org.apache.spark.ml.feature.VectorAssembler","timestamp":1501888311931,"sparkVersion":"2.2.0","uid":"vecAssembler_a24fe62a1389","paramMap":{"outputCol":"features","inputCols":["fare","age"]}}
