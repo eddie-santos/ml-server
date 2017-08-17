@@ -37,7 +37,7 @@ object ModelScorer {
 
   def predict(passengers: Seq[Passenger]): Seq[Prediction] = {
 
-    lazy val ds: Dataset[Passenger] = sc.parallelize(passengers).toDS
+    lazy val ds: Dataset[Passenger] = passengers.toDS //sc.parallelize(passengers).toDS
     val predictions: Seq[Prediction] = model.transform(ds)
       .select("name", "probability", "prediction")
       .withColumnRenamed("prediction", "survives")
