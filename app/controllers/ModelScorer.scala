@@ -11,10 +11,16 @@ object ModelScorer {
   Logger.getLogger("org").setLevel(Level.OFF)
   Logger.getLogger("akka").setLevel(Level.OFF)
 
+  val conf = new org.apache.spark.SparkConf()
+    .setSparkHome("/Users/ykhodorkovsky/spark-2.2.0-bin-hadoop2.7")
+    .setMaster("spark://ip-192-168-56-190.ec2.internal:7077")
+    .setJars(Seq(System.getProperty("user.dir") + "/target/scala-2.11/ml-server-assembly-1.0.jar"))
+    .setAppName("ml-server")
+
   val spark = SparkSession.builder
-    .master("local")
-    .appName("ml-server")
+    .config(conf)
     .getOrCreate()
+  implicit val sc = spark.sparkContext
 
   import spark.implicits._
 
@@ -31,10 +37,10 @@ object ModelScorer {
 
   def predict(passengers: Seq[Passenger]): Seq[Prediction] = {
 
-    val ds: Dataset[Passenger] = passengers.toDS
+    lazy val ds: Dataset[Passenger] = passengers.toDS //sc.parallelize(passengers).toDS
     val predictions: Seq[Prediction] = model.transform(ds)
-      .select("name","probability","prediction")
-      .withColumnRenamed("prediction","survives")
+      .select("name", "probability", "prediction")
+      .withColumnRenamed("prediction", "survives")
       .as[Prediction]
       .collect
       .toSeq
