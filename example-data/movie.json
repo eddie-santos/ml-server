@@ -1,0 +1,72 @@
+[
+	{
+		"pclass":1,
+		"name":"Rose",
+		"sex":"female",
+		"age":17,
+		"sibsp":1,
+		"parch":1,
+		"fare":200,
+		"embarked":"S"
+	},
+	{
+		"pclass":3,
+		"name":"Jack",
+		"sex":"male",
+		"age":19,
+		"sibsp":0,
+		"parch":0,
+		"fare":0,
+		"embarked":"S"
+	},
+	{
+		"pclass":3,
+		"name":"Female Jack",
+		"sex":"female",
+		"age":19,
+		"sibsp":0,
+		"parch":0,
+		"fare":0,
+		"embarked":"S"
+	},
+	{
+		"pclass":1,
+		"name":"First class Jack",
+		"sex":"male",
+		"age":19,
+		"sibsp":0,
+		"parch":0,
+		"fare":100,
+		"embarked":"S"
+	},
+	{
+		"pclass":3,
+		"name":"Old man Jack",
+		"sex":"male",
+		"age":70,
+		"sibsp":0,
+		"parch":0,
+		"fare":0,
+		"embarked":"S"
+	},
+	{
+		"pclass":1,
+		"name":"Cal",
+		"sex":"male",
+		"age":30,
+		"sibsp":1,
+		"parch":0,
+		"fare":200,
+		"embarked":"S"
+	},
+	{
+		"pclass":1,
+		"name":"Papa Cal",
+		"sex":"male",
+		"age":30,
+		"sibsp":0,
+		"parch":1,
+		"fare":200,
+		"embarked":"S"
+	}
+]

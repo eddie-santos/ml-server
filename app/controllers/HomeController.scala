@@ -2,7 +2,7 @@ package controllers
 
 import javax.inject._
 
-import models.Prediction
+import models.{Passenger, Prediction}
 import play.api.mvc._
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
@@ -11,19 +11,14 @@ import play.api.libs.functional.syntax._
 class HomeController @Inject()(cc: ControllerComponents) extends AbstractController(cc) {
 
   implicit val passengerReads: Reads[Passenger] = (
-    (JsPath \ "pclass").read[String] and
+    (JsPath \ "pclass").read[Double] and
       (JsPath \ "name").read[String] and
       (JsPath \ "sex").read[String] and
       (JsPath \ "age").readNullable[Double] and
       (JsPath \ "sibsp").read[Int] and
       (JsPath \ "parch").read[Int] and
-      (JsPath \ "ticket").read[String] and
-      (JsPath \ "fare").read[Double] and
-      (JsPath \ "cabin").readNullable[String] and
-      (JsPath \ "embarked").readNullable[String] and
-      (JsPath \ "boat").readNullable[String] and
-      (JsPath \ "body").readNullable[String] and
-      (JsPath \ "homeDest").readNullable[String]
+      (JsPath \ "fare").readNullable[Double] and
+      (JsPath \ "embarked").read[String]
     ) (Passenger.apply _)
 
   implicit val predictionWrites: Writes[Prediction] = (
@@ -38,6 +33,6 @@ class HomeController @Inject()(cc: ControllerComponents) extends AbstractControl
     val predictions: Seq[Prediction] = ModelScorer.predict(passengers)
     val outputData: JsValue = Json.toJson(predictions)
 
-    Ok(inputData)
+    Ok(outputData)
   }
 }

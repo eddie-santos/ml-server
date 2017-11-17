@@ -2,25 +2,10 @@ package controllers
 
 import com.google.common.cache.{CacheBuilder, CacheLoader}
 import models.{Passenger, Prediction}
-import org.apache.log4j.{Level, Logger}
 import org.apache.spark.ml.tuning.CrossValidatorModel
-import org.apache.spark.sql.{Dataset, SparkSession}
+import org.apache.spark.sql.{DataFrame, Row}
 
-object ModelScorer {
-
-  Logger.getLogger("org").setLevel(Level.OFF)
-  Logger.getLogger("akka").setLevel(Level.OFF)
-
-  val conf = new org.apache.spark.SparkConf()
-    .setSparkHome("/Users/ykhodorkovsky/spark-2.2.0-bin-hadoop2.7")
-    .setMaster("spark://ip-192-168-56-190.ec2.internal:7077")
-    .setJars(Seq(System.getProperty("user.dir") + "/target/scala-2.11/ml-server-assembly-1.0.jar"))
-    .setAppName("ml-server")
-
-  val spark = SparkSession.builder
-    .config(conf)
-    .getOrCreate()
-  implicit val sc = spark.sparkContext
+object ModelScorer extends LocalSparkConnection {
 
   import spark.implicits._
 
@@ -33,17 +18,33 @@ object ModelScorer {
       }
     )
 
-  val model: CrossValidatorModel = modelCache.get("trained-cv-pipeline")
+  val model: CrossValidatorModel = modelCache.get("trained-models/cv-pipeline-2017-08-21")
 
   def predict(passengers: Seq[Passenger]): Seq[Prediction] = {
 
-    lazy val ds: Dataset[Passenger] = passengers.toDS //sc.parallelize(passengers).toDS
-    val predictions: Seq[Prediction] = model.transform(ds)
-      .select("name", "probability", "prediction")
-      .withColumnRenamed("prediction", "survives")
-      .as[Prediction]
-      .collect
-      .toSeq
+    val passengerTuple = passengers.map{
+      (p: Passenger) => (p.pclass,p.name,p.sex,p.age,p.sibsp,p.parch,p.fare,p.embarked)
+    }
+
+    val passengerRDD = sc.parallelize(passengerTuple)
+    val columns: Seq[String] = Seq("pclass","name","sex","age","sibsp","parch","fare","embarked")
+    val df: DataFrame = passengerRDD.toDF(columns: _*)
+
+    def probabilityStrip(prob: String): Double = {
+      prob.split(",")(1).dropRight(1).take(5).toDouble
+    }
+
+    val predictionsDF: DataFrame = model.transform(df)
+      .select("name","probability","prediction")
+      .withColumnRenamed("prediction","survives")
+
+    val predictions: Seq[Prediction] = predictionsDF.collect
+      .map{(row: Row) =>
+        Prediction(row(0).toString, probabilityStrip(row(1).toString), (row(2) == 1))
+      }
+
+    predictionsDF.show()
+
     predictions
   }
 

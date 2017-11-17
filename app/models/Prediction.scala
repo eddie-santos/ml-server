@@ -1,6 +1,7 @@
 package models
 
-case class Prediction(name: String,
+case class Prediction(
+  name: String,
   probability: Double,
   survives: Boolean
 )
